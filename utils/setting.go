@@ -38,5 +38,5 @@ func LoadDataBase(file *ini.File) {
 	DbPort = file.Section("database").Key("DbPort").MustString("3306")
 	Dbuser = file.Section("database").Key("Dbuser").MustString("root")
 	DbPassWord = file.Section("database").Key("DbPassWord").MustString("raoxiang")
-	DbName = file.Section("database").Key("DbName").MustString("USTCInformationWeb")
+	DbName = file.Section("database").Key("DbName").MustString("USTC")
 }
