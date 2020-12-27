@@ -1,39 +1,57 @@
 package model
 
 import (
+	"University-Information-Website/utils"
+	"context"
 	"fmt"
+	"log"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
-
-	"University-Information-Website/utils"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var db *gorm.DB
-var err error
+var client *mongo.Client = nil
+var db *mongo.Database = nil
 
 func InitDb() {
-	db, err = gorm.Open(utils.Db, fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		utils.Dbuser,
-		utils.DbPassWord,
-		utils.Dbhost,
-		utils.DbPort,
-		utils.DbName,
-	))
-	if err != nil {
-		fmt.Printf("连接数据库失败,请检查参数: ", err)
+	var err error
+	url := utils.Db + "//" + utils.Dbhost + ":" + utils.DbPort
+	// Set client options
+	clientOptions := options.Client().ApplyURI(url)
+	// Connect to MongoDB
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	client, err = mongo.Connect(ctx, clientOptions)
+	if err == nil || client == nil {
+		fmt.Printf("database connect error")
+		log.Fatal("database connect error", err)
 	}
-	// 禁用表的复数形式
-	db.SingularTable(true)
+	// Check the connection
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		fmt.Println("ping connect error")
+		log.Fatal("ping connect error", err)
+	}
 
-	//db.AutoMigrate()
+	db = client.Database(utils.DbName)
+	if db == nil {
+		fmt.Println("switch database error")
+		log.Fatal("switch database error", err)
+	}
 
-	// 设置连接池最大闲置连接数
-	db.DB().SetMaxIdleConns(10)
-	// 设置数据库最大连接数
-	db.DB().SetMaxOpenConns(100)
-	// 设置最大可复用时间
-	db.DB().SetConnMaxLifetime(10 * time.Second)
-	//db.Close()
+	fmt.Println("connected to MongoDB!")
+}
+
+func Close() {
+	if client != nil {
+		err := client.Disconnect(context.TODO())
+		if err != nil {
+			fmt.Println("close MongoDB error")
+			log.Fatal("close MongoDB error", err)
+		}
+		fmt.Println("connection to MongoDB closed")
+	} else {
+		fmt.Println("not need close")
+	}
 }
