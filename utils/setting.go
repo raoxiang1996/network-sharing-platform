@@ -19,7 +19,7 @@ var (
 )
 
 func init() {
-	cfg, err := ini.Load("config/config.ini")
+	cfg, err := ini.Load("../config/config.ini")
 	if err != nil {
 		fmt.Printf("配置文件读取错误，请检查文件路径", err)
 	}
@@ -33,10 +33,11 @@ func LoadServer(file *ini.File) {
 }
 
 func LoadDataBase(file *ini.File) {
-	Db = file.Section("database").Key("Db").MustString("mysql")
+	Db = file.Section("database").Key("Db").MustString("mongo")
+	DbName = file.Section("database").Key("DbName").MustString("USTC")
 	Dbhost = file.Section("database").Key("Dbhost").MustString("localhost")
-	DbPort = file.Section("database").Key("DbPort").MustString("3306")
+	DbPort = file.Section("database").Key("DbPort").MustString("27017")
 	Dbuser = file.Section("database").Key("Dbuser").MustString("root")
 	DbPassWord = file.Section("database").Key("DbPassWord").MustString("raoxiang")
-	DbName = file.Section("database").Key("DbName").MustString("USTC")
+
 }

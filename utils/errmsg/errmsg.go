@@ -24,6 +24,12 @@ const (
 	ERROR_TOKEN_RUNTIME    = 1009
 	ERROR_TOKEN_WRONG      = 10010
 	ERROR_TOKEN_TYPE_WRONG = 1011
+
+	// code 3000 分类模块错误
+	ERROR_CATEGORY_USED      = 3001
+	ERROR_CATEGORY_EMPTY     = 3002
+	ERROR_CATEGORY_NOT_EXIST = 3003
+	ERROR_GET_CATEGORY_FAIL  = 3004
 )
 
 var codemsg = map[int]string{
@@ -42,6 +48,11 @@ var codemsg = map[int]string{
 	ERROR_TOKEN_RUNTIME:    "TOKEN已过期",
 	ERROR_TOKEN_WRONG:      "TOKEN不正确",
 	ERROR_TOKEN_TYPE_WRONG: "TOKEN格式不正确",
+
+	ERROR_CATEGORY_USED:      "分类名已使用",
+	ERROR_CATEGORY_EMPTY:     "分类名为空",
+	ERROR_CATEGORY_NOT_EXIST: "分类不存在",
+	ERROR_GET_CATEGORY_FAIL:  "查询分类失败",
 }
 
 func GetErrMsg(code int) string {
