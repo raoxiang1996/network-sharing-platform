@@ -20,9 +20,9 @@ func AddUser(c *gin.Context) {
 		return
 	}
 
-	code := model.CheckUser(data)
+	code := model.CheckUser(&data)
 	if code == errmsg.SUCCESS {
-		model.CreateUser(data)
+		model.InsertUser(&data)
 	} else {
 		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
 			errmsg.GetErrMsg(code))
@@ -82,16 +82,16 @@ func GetUsers(c *gin.Context) {
 // 修改用户
 func UpdateUser(c *gin.Context) {
 	var data model.User
-	id, _ := strconv.Atoi(c.Param("id"))
+	id := c.Param("_id")
 	c.ShouldBindJSON(&data)
-	code := model.CheckUser(data)
+	code := model.CheckUser(&data)
 	if code != errmsg.SUCCESS {
 		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
 			errmsg.GetErrMsg(code))
 		c.JSON(http.StatusBadRequest, error)
 		return
 	}
-	model.UpdateUser(id, data)
+	model.UpdateUser(id, &data)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
 		"message": errmsg.GetErrMsg(code),

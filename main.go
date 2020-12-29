@@ -7,5 +7,6 @@ import (
 
 func main() {
 	model.InitDb()
+	model.InitModel()
 	routes.InitRouter()
 }
