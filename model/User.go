@@ -17,7 +17,7 @@ import (
 var collection *mongo.Collection = nil
 
 type User struct {
-	ID        bson.ObjectId `bson:"id"`
+	ID        bson.ObjectId `bson:"_id"`
 	CreatedAt time.Time     `bson:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at"`
 	Username  string        `bson:"username"`

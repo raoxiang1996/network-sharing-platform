@@ -16,15 +16,15 @@ var db *mongo.Database = nil
 
 func InitDb() {
 	var err error
-	url := utils.Db + "//" + utils.Dbhost + ":" + utils.DbPort
+	url := utils.Db + "://" + utils.Dbhost + ":" + utils.DbPort
 	// Set client options
 	clientOptions := options.Client().ApplyURI(url)
 	// Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	client, err = mongo.Connect(ctx, clientOptions)
-	if err == nil || client == nil {
-		fmt.Printf("database connect error")
+	if err != nil || client == nil {
+		fmt.Println("database connect error")
 		log.Fatal("database connect error", err)
 	}
 	// Check the connection
