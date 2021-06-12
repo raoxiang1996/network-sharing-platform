@@ -60,7 +60,6 @@ func InsertUser(data *User) int {
 		log.Fatal("insert a user fail,", err)
 		return errmsg.ERROR
 	}
-	//data.ID = bson.ObjectIdHex(insertResult.InsertedID.(string))
 	fmt.Println("Inserted a single document: ", insertResult.InsertedID.(string))
 	return errmsg.SUCCESS
 }
@@ -109,9 +108,10 @@ func ScrypyPw(password string) string {
 }
 
 // 登录验证
-func CheckLogin(username string, password string) int {
+func CheckLogin(data *User) int {
+	password := data.Password
 	var result User
-	filter := bson.M{"username": username}
+	filter := bson.M{"username": data.Username}
 	err := userCollection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		fmt.Println("check login error")
@@ -123,7 +123,7 @@ func CheckLogin(username string, password string) int {
 	if ScrypyPw(password) != result.Password {
 		return errmsg.ERROR_PASSWORD_WRONG
 	}
-	if result.Role != 1 {
+	if result.Role != 1 || result.Role != 0 {
 		return errmsg.ERROR_USER_NOT_RIGHT
 	}
 	return errmsg.SUCCESS
