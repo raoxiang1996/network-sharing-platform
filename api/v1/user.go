@@ -96,5 +96,4 @@ func UpdateUser(c *gin.Context) {
 		"status":  code,
 		"message": errmsg.GetErrMsg(code),
 	})
-
 }
