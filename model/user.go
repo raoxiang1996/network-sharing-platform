@@ -16,7 +16,7 @@ import (
 var userCollection *mongo.Collection = nil
 
 type User struct {
-	ID       bson.ObjectId `bson:"_id"`
+	UserID   bson.ObjectId `bson:"user_id"`
 	Username string        `bson:"username"`
 	Password string        `bson:"password"`
 	Role     int           `bson:"role"`
@@ -42,7 +42,7 @@ func CheckUser(data *User) int {
 			return errmsg.SUCCESS
 		}
 	}
-	if result.ID.String() != "" {
+	if result.UserID.String() != "" {
 		return errmsg.ERROR_UERNAME_USED
 	}
 	return errmsg.SUCCESS
@@ -50,7 +50,7 @@ func CheckUser(data *User) int {
 
 // 添加用户
 func InsertUser(data *User) int {
-	data.ID = bson.NewObjectId()
+	data.UserID = bson.NewObjectId()
 	newData := data
 	// 密码加密
 	newData.Password = ScrypyPw(data.Password)
@@ -117,7 +117,7 @@ func CheckLogin(data *User) int {
 		fmt.Println("check login error")
 		log.Fatal("check login error,", err)
 	}
-	if result.ID.String() == "" {
+	if result.UserID.String() == "" {
 		return errmsg.ERROR_USER_NOT_EXIST
 	}
 	if ScrypyPw(password) != result.Password {

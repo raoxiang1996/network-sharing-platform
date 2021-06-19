@@ -12,27 +12,26 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Course struct {
-	ID         bson.ObjectId   `bson:"_id"`
+type Lesson struct {
+	LessonID   bson.ObjectId   `bson:"lesson_id"`
 	CoursesId  bson.ObjectId   `bson:"courses_id"`
 	path       string          `bson:"path"`
-	Comments   []Comment       `bson:"comments"`
 	uploadTime common.JsonTime `bson:"upload_time"  json:"createtime"`
 }
 
 type Courses struct {
-	ID           bson.ObjectId   `bson:"_id"`
+	CoursesID    bson.ObjectId   `bson:"courses_id"`
 	Userid       bson.ObjectId   `bson:"userid"`
 	CourseName   string          `bson:"course_name"`
 	Introduction string          `bson:"introduction"`
-	Subject      []Course        `bson:"subject"`
+	Subject      []Lesson        `bson:"subject"`
 	Createtime   common.JsonTime `bson:"createtime"  json:"createtime"`
 }
 
 var coursesCollection *mongo.Collection = nil
 
 // 添加课程
-func InsertCourse(data *Course, courseId string, userId string) int {
+func InsertCourse(data *Lesson, courseId string, userId string) int {
 
 	return errmsg.SUCCESS
 }
