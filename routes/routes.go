@@ -20,6 +20,8 @@ func InitRouter() {
 
 		auth.POST("user/add", v1.AddUser)
 		auth.GET("users", v1.GetUsers)
+
+		auth.PUT("upload", v1.Upload)
 	}
 	//router := r.Group("api/v1")
 	//{
