@@ -17,13 +17,6 @@ const (
 	timeFormart = "2006-01-02 15:04:05"
 )
 
-//实现json反序列化，从传递的字符串中解析成时间对象
-func (t *JsonTime) UnmarshalJSON(data []byte) (err error) {
-	now, err := time.ParseInLocation(`"`+timeFormart+`"`, string(data), time.Local)
-	*t = JsonTime(now)
-	return
-}
-
 //实现json序列化，将时间转换成字符串byte数组
 func (t JsonTime) MarshalJSON() ([]byte, error) {
 	b := make([]byte, 0, len(timeFormart)+2)
@@ -31,6 +24,13 @@ func (t JsonTime) MarshalJSON() ([]byte, error) {
 	b = time.Time(t).AppendFormat(b, timeFormart)
 	b = append(b, '"')
 	return b, nil
+}
+
+//实现json反序列化，从传递的字符串中解析成时间对象
+func (t *JsonTime) UnmarshalJSON(data []byte) (err error) {
+	now, err := time.ParseInLocation(`"`+timeFormart+`"`, string(data), time.Local)
+	*t = JsonTime(now)
+	return
 }
 
 //mongodb是存储bson格式，因此需要实现序列化bsonvalue(这里不能实现MarshalBSON，MarshalBSON是处理Document的)，将时间转换成mongodb能识别的primitive.DateTime

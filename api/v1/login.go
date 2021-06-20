@@ -21,7 +21,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, code := middleware.SetToken(data.ID, data.Username)
+	token, code := middleware.SetToken(data.UserID, data.Username)
 	if code != errmsg.SUCCESS {
 		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
 			errmsg.GetErrMsg(code))
