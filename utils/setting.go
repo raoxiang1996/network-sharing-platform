@@ -17,6 +17,11 @@ var (
 	Dbuser     string
 	DbPassWord string
 	DbName     string
+
+	AccessKey string
+	SecretKey string
+	Bucket    string
+	QnSever   string
 )
 
 func init() {
@@ -26,6 +31,15 @@ func init() {
 	}
 	LoadServer(cfg)
 	LoadDataBase(cfg)
+	LoadQn(cfg)
+}
+
+func LoadQn(file *ini.File) {
+
+	AccessKey = file.Section("qn").Key("AccessKey").MustString("")
+	SecretKey = file.Section("qn").Key("SecretKey").MustString("")
+	Bucket = file.Section("qn").Key("Bucket").MustString("")
+	QnSever = file.Section("qn").Key("QnSever").MustString("")
 }
 
 func LoadServer(file *ini.File) {
