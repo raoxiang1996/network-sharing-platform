@@ -1,10 +1,12 @@
 package model
 
 import (
+	"University-Information-Website/middleware"
 	"context"
 	"encoding/base64"
 	"fmt"
 	"log"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/scrypt"
@@ -16,10 +18,10 @@ import (
 var userCollection *mongo.Collection = nil
 
 type User struct {
-	UserID   bson.ObjectId `bson:"user_id"`
-	Username string        `bson:"username"`
-	Password string        `bson:"password"`
-	Role     int           `bson:"role"`
+	ID       string `bson:"_id"`
+	Username string `bson:"username"`
+	Password string `bson:"password"`
+	Role     int    `bson:"role"`
 }
 
 // 查询用户是否存在
@@ -42,7 +44,7 @@ func CheckUser(data *User) int {
 			return errmsg.SUCCESS
 		}
 	}
-	if result.UserID.String() != "" {
+	if result.ID != "" {
 		return errmsg.ERROR_UERNAME_USED
 	}
 	return errmsg.SUCCESS
@@ -50,7 +52,7 @@ func CheckUser(data *User) int {
 
 // 添加用户
 func InsertUser(data *User) int {
-	data.UserID = bson.NewObjectId()
+	data.ID = bson.NewObjectId().Hex()
 	newData := data
 	// 密码加密
 	newData.Password = ScrypyPw(data.Password)
@@ -87,7 +89,7 @@ func UpdateUser(id string, data *User) int {
 	updateResult, err := userCollection.UpdateOne(context.TODO(), filter, data)
 	if err != nil {
 		fmt.Println("update a user fail")
-		log.Fatal("update a user fail,", err)
+		log.Fatal("update  auser fail,", err)
 	}
 	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
 	return errmsg.SUCCESS
@@ -117,7 +119,7 @@ func CheckLogin(data *User) int {
 		fmt.Println("check login error")
 		log.Fatal("check login error,", err)
 	}
-	if result.UserID.String() == "" {
+	if result.ID == "" {
 		return errmsg.ERROR_USER_NOT_EXIST
 	}
 	if ScrypyPw(password) != result.Password {
@@ -141,4 +143,22 @@ func userInit() {
 		fmt.Println("mongodb user collection init error, db has not inited")
 		log.Fatal("mongodb user collection init error, db has not inited")
 	}
+}
+
+// tokenHeader := c.Request.Header.Get("Authorization")
+func CheckAuthority(tokenHeader string) int {
+	checkToken := strings.Split(tokenHeader, " ")
+	key, _ := middleware.CheckToken(checkToken[1])
+	return GetAuthority(key.Id)
+}
+
+func GetAuthority(userid string) int {
+	var result User
+	filter := bson.M{"_id": userid}
+	err := userCollection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		fmt.Println("GetAuthority fail")
+		log.Fatal("GetAuthority fail,", err)
+	}
+	return result.Role
 }

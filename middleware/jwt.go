@@ -5,8 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
@@ -17,13 +15,13 @@ import (
 var JwtKey = []byte(utils.JwtKey)
 
 type MyClaims struct {
-	id       bson.ObjectId `json:"id"`
-	Username string        `json:"username"`
+	id       string `json:"id"`
+	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
 // 生成token
-func SetToken(id bson.ObjectId, username string) (string, int) {
+func SetToken(id string, username string) (string, int) {
 	expireTime := time.Now().Add(10 * time.Hour)
 	SetClaims := MyClaims{
 		id,
