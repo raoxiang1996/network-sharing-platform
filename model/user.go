@@ -1,16 +1,13 @@
 package model
 
 import (
-	"University-Information-Website/middleware"
 	"context"
 	"encoding/base64"
 	"fmt"
-	"log"
-	"strings"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/scrypt"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 
 	"University-Information-Website/utils/errmsg"
 )
@@ -50,9 +47,10 @@ func CheckUser(data *User) int {
 	return errmsg.SUCCESS
 }
 
-// 添加用户
+// 添加普通用户
 func InsertUser(data *User) int {
 	data.ID = bson.NewObjectId().Hex()
+	data.Role = 3
 	newData := data
 	// 密码加密
 	newData.Password = ScrypyPw(data.Password)
@@ -109,7 +107,7 @@ func ScrypyPw(password string) string {
 	return fpw
 }
 
-// 登录验证
+// 超级管理员登录验证
 func CheckLogin(data *User) int {
 	password := data.Password
 	var result User
@@ -125,8 +123,26 @@ func CheckLogin(data *User) int {
 	if ScrypyPw(password) != result.Password {
 		return errmsg.ERROR_PASSWORD_WRONG
 	}
-	if result.Role != 1 || result.Role != 0 {
+	if result.Role != 1 {
 		return errmsg.ERROR_USER_NOT_RIGHT
+	}
+	return errmsg.SUCCESS
+}
+
+func CheckFrontLogin(data *User) int {
+	password := data.Password
+	var result User
+	filter := bson.M{"username": data.Username}
+	err := userCollection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		fmt.Println("check login error")
+		log.Fatal("check login error,", err)
+	}
+	if result.ID == "" {
+		return errmsg.ERROR_USER_NOT_EXIST
+	}
+	if ScrypyPw(password) != result.Password {
+		return errmsg.ERROR_PASSWORD_WRONG
 	}
 	return errmsg.SUCCESS
 }
@@ -143,13 +159,6 @@ func userInit() {
 		fmt.Println("mongodb user collection init error, db has not inited")
 		log.Fatal("mongodb user collection init error, db has not inited")
 	}
-}
-
-// tokenHeader := c.Request.Header.Get("Authorization")
-func CheckAuthority(tokenHeader string) int {
-	checkToken := strings.Split(tokenHeader, " ")
-	key, _ := middleware.CheckToken(checkToken[1])
-	return GetAuthority(key.Id)
 }
 
 func GetAuthority(userid string) int {

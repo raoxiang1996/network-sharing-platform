@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"University-Information-Website/middleware"
 	"net/http"
 	"strconv"
 
@@ -38,8 +39,31 @@ func AddUser(c *gin.Context) {
 
 // 删除用户
 func DeleteUser(c *gin.Context) {
+	var code int
 	id := c.Param("id")
-	code := model.DeleteUser(id)
+	tokenHeader := c.Request.Header.Get("Authorization")
+	userId, _, role, code := middleware.ParseToken(tokenHeader)
+
+	if code != errmsg.SUCCESS {
+		code = errmsg.ERROR_USER_DEL_ERROR
+		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
+			errmsg.GetErrMsg(code))
+		c.JSON(http.StatusBadRequest, error)
+		return
+	}
+
+	if role >= 2 && userId == id {
+		code = model.DeleteUser(id)
+	} else if role < 2 && userId != id {
+		code = model.DeleteUser(id)
+	} else {
+		code = errmsg.ERROR_USER_DEL_ERROR
+		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
+			errmsg.GetErrMsg(code))
+		c.JSON(http.StatusBadRequest, error)
+		return
+	}
+
 	if code != errmsg.SUCCESS {
 		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
 			errmsg.GetErrMsg(code))
@@ -95,5 +119,12 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
 		"message": errmsg.GetErrMsg(code),
+	})
+}
+
+func GetAuthority(c *gin.Context) {
+	id := c.Param("id")
+	c.JSON(http.StatusOK, gin.H{
+		"role": model.GetAuthority(id),
 	})
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"University-Information-Website/model"
+	"University-Information-Website/routes"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -48,10 +49,40 @@ func testDeleteLesson() {
 	model.DeleteLesson(courseId, lessonId)
 }
 
+func testInsertComment() {
+	courseId := "60d03c21b1f7f20d38ed3a16"
+	lessonId := "60d03f22b1f7f21cb8ba2216"
+	sc := model.SingleComment{
+		"",
+		"60d04db7b1f7f22e38216b6a",
+		"raoxiang",
+		"测试评论",
+		"2006-01-02 15:04:05",
+	}
+	model.InsertComment(&sc, courseId, lessonId)
+}
+
+func testCreateComments() {
+	courseId := "60d03c21b1f7f20d38ed3a16"
+	lessonId := "60d03f22b1f7f21cb8ba2216"
+	model.CreateComments(courseId, lessonId)
+}
+
+func testDeleteComment() {
+	courseId := "60d03c21b1f7f20d38ed3a16"
+	lessonId := "60d03f22b1f7f21cb8ba2216"
+	commentId := "60d0587b2eb5a45f78af294d"
+	model.DeleteComment(courseId, lessonId, commentId)
+}
+
 func main() {
 	model.InitDb()
 	model.InitModel()
-	testDeleteLesson()
+	routes.InitRouter()
+	//testCreateComments()
+	//testInsertComment()
+	//testDeleteComment()
+	//testDeleteLesson()
 	//testInsertLesson()
 	//testUpdateCourse()
 	//testInsertCourse()
