@@ -14,8 +14,8 @@ import (
 type Lesson struct {
 	ID         string `bson:"_id"`
 	CoursesId  string `bson:"courses_id"`
-	path       string `bson:"path"`
-	uploadTime string `bson:"upload_time"  json:"createtime"`
+	Path       string `bson:"path"`
+	UploadTime string `bson:"upload_time"  json:"createtime"`
 }
 
 type Courses struct {
@@ -50,43 +50,44 @@ func CreateCourse(data *Courses, userId string) int {
 // 添加一节课课程
 func InsertLesson(data *Lesson, coursesId string) int {
 	data.ID = bson.NewObjectId().Hex()
-	insertResult, err := coursesCollection.InsertOne(context.TODO(), data)
+	fmt.Println(data)
+	filter := bson.M{"_id": coursesId}
+	update := bson.M{"$push": bson.M{"subject": data}}
+	insertResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("insert a lesson fail")
 		log.Fatal("insert a lesson fail,", err)
 		return errmsg.ERROR
 	}
-	fmt.Println("insert a single document: ", insertResult.InsertedID.(string))
+	fmt.Printf("Matched %v documents and insert %v documents.\n", insertResult.MatchedCount, insertResult.ModifiedCount)
 	return errmsg.SUCCESS
 }
 
 //更新课程信息
 func UpdateCourse(coursesId string, courseName string, introduction string) int {
-	filter := bson.D{{"courses_id", coursesId}}
-	update := bson.D{{"course_name", courseName}, {"introduction", introduction}}
+	filter := bson.M{"_id": coursesId}
+	update := bson.M{"$set": bson.M{"course_name": courseName, "introduction": introduction}}
 	updateResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("update a course fail")
 		log.Fatal("update a course fail,", err)
 		return errmsg.ERROR
 	}
-	fmt.Println("deleted a single comment: ", updateResult.UpsertedID.(string))
+	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
 	return errmsg.SUCCESS
 }
 
 //删除一节课程
 func DeleteLesson(coursesId string, lessonId string) int {
-	filter := bson.D{{"courses_id", coursesId}}
-	update := bson.D{
-		{"$pull", bson.M{"subject": bson.D{{"comment_id", lessonId}}}},
-	}
-	insertResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
+	filter := bson.M{"_id": coursesId}
+	update := bson.M{"$pull": bson.M{"subject": bson.M{"_id": lessonId, "courses_id": coursesId}}}
+	updateResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("delete a course fail")
 		log.Fatal("delete a course fail,", err)
 		return errmsg.ERROR
 	}
-	fmt.Println("deleted a single comment: ", insertResult.UpsertedID.(string))
+	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
 	return errmsg.SUCCESS
 }
 
