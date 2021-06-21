@@ -50,7 +50,6 @@ func CreateCourse(data *Courses, userId string) int {
 // 添加一节课课程
 func InsertLesson(data *Lesson, coursesId string) int {
 	data.ID = bson.NewObjectId().Hex()
-	fmt.Println(data)
 	filter := bson.M{"_id": coursesId}
 	update := bson.M{"$push": bson.M{"subject": data}}
 	insertResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)

@@ -13,7 +13,6 @@ import (
 
 type SingleComment struct {
 	ID         string `bson:"_id"`
-	CommentID  string `bson:"_id"`
 	UserId     string `bson:"user_id"`
 	Username   string `bson:"username"`
 	Content    string `bson:"content"`
@@ -24,62 +23,58 @@ type Comments struct {
 	ID          string          `bson:"_id"`
 	CoursesID   string          `bson:"courses_id"`
 	LessonID    string          `bson:"lesson_id"`
-	allComments []SingleComment `bson:"all_comments"`
+	AllComments []SingleComment `bson:"all_comments"`
 }
 
 var commentCollection *mongo.Collection = nil
 
+//添加对应每个小节的Comments表
+func CreateComments(coursesId string, lessonId string) int {
+	data := Comments{
+		bson.NewObjectId().Hex(),
+		coursesId,
+		lessonId,
+		make([]SingleComment, 0),
+	}
+	insertResult, err := commentCollection.InsertOne(context.TODO(), data)
+	if err != nil {
+		fmt.Println("create a comments fail")
+		log.Fatal("create a comments fail,", err)
+		return errmsg.ERROR
+	}
+	fmt.Println("create a comments document: ", insertResult.InsertedID.(string))
+	return errmsg.SUCCESS
+}
+
 // 添加评论
 func InsertComment(data *SingleComment, coursesId string, lessonId string) int {
-	data.CommentID = bson.NewObjectId().Hex()
-	filter := bson.D{{"courses_id", coursesId}, {"lesson_id", lessonId}}
-	update := bson.D{
-		{"$push", bson.D{
-			{"all_comments", data},
-		}},
-	}
-	insertResult, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	data.ID = bson.NewObjectId().Hex()
+	filter := bson.M{"courses_id": coursesId, "lesson_id": lessonId}
+	update := bson.M{"$push": bson.M{"all_comments": data}}
+	insertResult, err := commentCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("insert a comment fail")
 		log.Fatal("insert a comment fail,", err)
 		return errmsg.ERROR
 	}
-	fmt.Println("Inserted a single comment: ", insertResult.UpsertedID.(string))
+	fmt.Printf("Matched %v documents and insert %v documents.\n", insertResult.MatchedCount, insertResult.ModifiedCount)
 	return errmsg.SUCCESS
 }
 
 //删除评论
 func DeleteComment(coursesId string, lessonId string, commentId string) int {
-	filter := bson.D{{"courses_id", coursesId}, {"lesson_id", lessonId}}
-	update := bson.D{
-		{"$pull", bson.M{"all_comments": bson.D{{"comment_id", commentId}}}},
-	}
-	insertResult, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	filter := bson.M{"courses_id": coursesId, "lesson_id": lessonId}
+	update := bson.M{"$pull": bson.M{"all_comments": bson.M{"_id": commentId}}}
+	insertResult, err := commentCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("delete a comment fail")
 		log.Fatal("delete a comment fail,", err)
 		return errmsg.ERROR
 	}
-	fmt.Println("deleted a single comment: ", insertResult.UpsertedID.(string))
+	fmt.Printf("Matched %v documents and insert %v documents.\n", insertResult.MatchedCount, insertResult.ModifiedCount)
 	return errmsg.SUCCESS
 }
 
-func CreateCourseComment(coursesId string, lessonId string) int {
-	data := Comments{
-		bson.NewObjectId().Hex(),
-		coursesId,
-		lessonId,
-		nil,
-	}
-	insertResult, err := userCollection.InsertOne(context.TODO(), data)
-	if err != nil {
-		fmt.Println("create a comment fail")
-		log.Fatal("create a comment fail,", err)
-		return errmsg.ERROR
-	}
-	fmt.Println("create a single document: ", insertResult.InsertedID.(string))
-	return errmsg.SUCCESS
-}
 func commentInit() {
 	if db != nil {
 		if commentCollection == nil {

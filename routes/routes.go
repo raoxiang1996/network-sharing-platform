@@ -18,12 +18,15 @@ func InitRouter() {
 		auth.PUT("user/:id", v1.UpdateUser)
 		auth.DELETE("user/:id", v1.DeleteUser)
 
-		auth.POST("user/add", v1.AddUser)
 		auth.GET("users", v1.GetUsers)
-
 		auth.PUT("upload", v1.Upload)
 	}
-	//router := r.Group("api/v1")
+
+	router := r.Group("api/v1")
+	{
+		router.POST("user/add", v1.AddUser)
+		router.POST("login", v1.Login)
+	}
 	//{
 	//	// User模块的路由接口
 	//	router.PUT("user/:id", v1.UpdateUser)

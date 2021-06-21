@@ -18,6 +18,7 @@ func InitDb() {
 	var err error
 	url := utils.Db + "://" + utils.Dbuser + ":" + utils.DbPassWord + "@" + utils.Dbhost + ":" + utils.DbPort
 	// Set client options
+	println(url)
 	clientOptions := options.Client().ApplyURI(url)
 	// Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
