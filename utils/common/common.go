@@ -48,3 +48,12 @@ func (t *JsonTime) UnmarshalBSONValue(t2 bsontype.Type, data []byte) error {
 	*t = JsonTime(v.Time())
 	return nil
 }
+
+func GetNowTime() (string, error) {
+	t := JsonTime(time.Now())
+	now, err := t.MarshalJSON()
+	if err != nil {
+		return "", err
+	}
+	return string(now), nil
+}
