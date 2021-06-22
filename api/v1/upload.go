@@ -12,6 +12,8 @@ import (
 
 func UploadImg(c *gin.Context) {
 	file, fileHeader, err := c.Request.FormFile("file")
+	coursesId := c.Request.FormValue("courses_id")
+	lessonId := c.Request.FormValue("lesson_id")
 	if err != nil {
 		fmt.Println("err:", err)
 		code := errmsg.ERROR

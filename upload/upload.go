@@ -12,10 +12,12 @@ import (
 	"University-Information-Website/utils/errmsg"
 )
 
-func Upload(file multipart.File, fileSize int64) (string, int) {
+func Upload(file multipart.File, fileSize int64, coursesId string, lessonId string) (string, int) {
+	keyToOverwrite := coursesId + lessonId
 	putPolicy := storage.PutPolicy{
-		Scope: utils.Bucket,
+		Scope: fmt.Sprintf("%s:%s", utils.Bucket, keyToOverwrite),
 	}
+
 	mac := qbox.NewMac(utils.AccessKey, utils.SecretKey)
 	upToken := putPolicy.UploadToken(mac)
 	cfg := storage.Config{
@@ -29,7 +31,7 @@ func Upload(file multipart.File, fileSize int64) (string, int) {
 	formUploader := storage.NewFormUploader(&cfg)
 	ret := storage.PutRet{}
 
-	err := formUploader.PutWithoutKey(context.Background(), &ret, upToken, file, fileSize, &putExtra)
+	err := formUploader.Put(context.Background(), &ret, upToken, keyToOverwrite, file, fileSize, &putExtra)
 	if err != nil {
 		fmt.Println("err,", err)
 		return "", errmsg.ERROR

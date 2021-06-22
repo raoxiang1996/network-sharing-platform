@@ -19,8 +19,8 @@ func InitRouter() {
 		auth.DELETE("user/:id", v1.DeleteUser)
 
 		auth.GET("users", v1.GetUsers)
-		auth.PUT("upload/img", v1.UploadImg)
-		auth.PUT("upload/video", v1.UploadImg)
+		auth.POST("upload/img", v1.UploadImg)
+		auth.POST("upload/video", v1.UploadVideo)
 	}
 
 	router := r.Group("api/v1")
