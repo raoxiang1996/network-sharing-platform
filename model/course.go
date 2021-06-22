@@ -81,6 +81,8 @@ func DeleteLesson(coursesId string, lessonId string) int {
 	filter := bson.M{"_id": coursesId}
 	update := bson.M{"$pull": bson.M{"subject": bson.M{"_id": lessonId, "courses_id": coursesId}}}
 	updateResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
+	//删除这节的所有评论
+
 	if err != nil {
 		fmt.Println("delete a course fail")
 		log.Fatal("delete a course fail,", err)
@@ -93,6 +95,8 @@ func DeleteLesson(coursesId string, lessonId string) int {
 //删除课程
 func DeleteCourses(coursesId string) int {
 	deleteResult, err := coursesCollection.DeleteOne(context.TODO(), bson.M{"_id": coursesId})
+	//删除课程下所有评论
+
 	if err != nil {
 		log.Fatal("delete courses fail", err)
 		return errmsg.ERROR

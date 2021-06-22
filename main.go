@@ -2,7 +2,7 @@ package main
 
 import (
 	"University-Information-Website/model"
-	"University-Information-Website/routes"
+	"fmt"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -75,13 +75,40 @@ func testDeleteComment() {
 	model.DeleteComment(courseId, lessonId, commentId)
 }
 
+func testInsertUser() {
+	data := model.User{
+		bson.NewObjectId().Hex(),
+		"raoxiang",
+		"raoxiang",
+		1,
+	}
+	model.InsertUser(&data)
+}
+
+func print() {
+	fmt.Println("hello world!")
+}
+
+func testTiming() {
+	model.Timing()
+	res, _ := model.Retrieve()
+	for i := 0; i < len(res); i++ {
+		fmt.Println(res[i].CourseName, " ", res[i].CourseId)
+	}
+}
+
 func main() {
-	model.InitDb()
-	model.InitModel()
-	routes.InitRouter()
+
 	//testCreateComments()
 	//testInsertComment()
 	//testDeleteComment()
+	//testDeleteLesson()
+	model.InitDb()
+	model.InitModel()
+	testTiming()
+	//now, _ := common.GetNowTime()
+	//fmt.Println(now)
+	//testInsertUser()
 	//testDeleteLesson()
 	//testInsertLesson()
 	//testUpdateCourse()

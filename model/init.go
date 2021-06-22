@@ -4,4 +4,5 @@ func InitModel() {
 	userInit()
 	commentInit()
 	courseInit()
+	IndexInit()
 }

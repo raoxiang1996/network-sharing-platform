@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/robfig/cron"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,6 +14,14 @@ import (
 )
 
 type JsonTime time.Time
+
+const (
+	MINUTE = "0 */1 * * * ?"
+	hour   = "0 0 * * * *"
+	DAY    = "0 0 0 * * *"
+	WEEK   = "0 0 0 * * 0"
+	YEAR   = "0 0 0 1 1 *"
+)
 
 const (
 	timeFormart = "2006-01-02 15:04:05"
@@ -56,4 +66,12 @@ func GetNowTime() (string, error) {
 		return "", err
 	}
 	return string(now), nil
+}
+
+func CronInit(myfunc func(), time string) {
+	go func() {
+		crontab := cron.New()
+		crontab.AddFunc(time, myfunc)
+		crontab.Start()
+	}()
 }
