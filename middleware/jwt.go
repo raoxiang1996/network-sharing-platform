@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"University-Information-Website/model"
 	"net/http"
 	"strings"
 	"time"
@@ -38,6 +39,17 @@ func SetToken(id string, username string) (string, int) {
 		return "", errmsg.ERROR
 	}
 	return token, errmsg.SUCCESS
+
+}
+
+// tokenHeader := c.Request.Header.Get("Authorization")
+func ParseToken(tokenHeader string) (id string, userName string, role int, code int) {
+	checkToken := strings.Split(tokenHeader, " ")
+	key, code := CheckToken(checkToken[1])
+	if code != errmsg.SUCCESS {
+		return "", "", 0, errmsg.ERROR_TOKEN_WRONG
+	}
+	return key.Id, key.Username, model.GetAuthority(key.Id), errmsg.SUCCESS
 
 }
 

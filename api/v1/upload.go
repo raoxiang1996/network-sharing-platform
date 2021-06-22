@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Upload(c *gin.Context) {
+func UploadImg(c *gin.Context) {
 	file, fileHeader, err := c.Request.FormFile("file")
 	if err != nil {
 		fmt.Println("err:", err)
