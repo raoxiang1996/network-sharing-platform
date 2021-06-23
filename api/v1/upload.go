@@ -10,8 +10,10 @@ import (
 	"University-Information-Website/utils/errmsg"
 )
 
-func UploadImg(c *gin.Context) {
+func Upload(c *gin.Context) {
 	file, fileHeader, err := c.Request.FormFile("file")
+	coursesId := c.Request.FormValue("courses_id")
+	lessonId := c.Request.FormValue("lesson_id")
 	if err != nil {
 		fmt.Println("err:", err)
 		code := errmsg.ERROR
@@ -22,7 +24,7 @@ func UploadImg(c *gin.Context) {
 	}
 
 	fileSize := fileHeader.Size
-	url, code := upload.Upload(file, fileSize)
+	url, code := upload.Upload(file, fileSize, coursesId, lessonId)
 	c.JSON(http.StatusOK, gin.H{
 		"status": code,
 		"msg":    errmsg.GetErrMsg(code),

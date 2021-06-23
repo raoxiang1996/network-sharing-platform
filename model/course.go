@@ -131,9 +131,13 @@ func InsertLesson(data *Lesson, coursesId string) int {
 }
 
 //更新课程信息
-func UpdateCourse(coursesId string, courseName string, introduction string) int {
+func UpdateCourse(data *Courses, coursesId string) int {
 	filter := bson.M{"_id": coursesId}
-	update := bson.M{"$set": bson.M{"course_name": courseName, "introduction": introduction}}
+	upDateData := bson.M{
+		"course_name":  data.CourseName,
+		"introduction": data.Introduction,
+		"images":       data.Images}
+	update := bson.M{"$set": upDateData}
 	updateResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("update a course fail")
