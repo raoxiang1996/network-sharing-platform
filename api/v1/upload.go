@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	upload "University-Information-Website/Upload"
+	upload "University-Information-Website/upload"
 	"University-Information-Website/utils/errmsg"
 )
 
