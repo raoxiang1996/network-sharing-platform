@@ -12,7 +12,9 @@ import (
 	"University-Information-Website/utils/errmsg"
 )
 
-var indexCollection *mongo.Collection = nil
+var homepageCollection *mongo.Collection = nil
+
+const GET_COURSE_NUMBER = 30
 
 type CourseInfo struct {
 	ID          string `bson:"_id"`
@@ -24,7 +26,7 @@ type CourseInfo struct {
 
 func Timing() int {
 	findoptions := options.Find()
-	findoptions.SetLimit(30)
+	findoptions.SetLimit(GET_COURSE_NUMBER)
 	findoptions.SetSort(bson.M{"createtime": -1})
 	cursor, err := coursesCollection.Find(context.TODO(), bson.M{}, findoptions)
 	if err != nil {
@@ -53,15 +55,15 @@ func Timing() int {
 		tmpCourseInfos.Createtime = tmpCourse.Createtime
 		courseInfos = append(courseInfos, tmpCourseInfos)
 	}
-	err = indexCollection.Drop(context.TODO())
+	err = homepageCollection.Drop(context.TODO())
 	if err != nil {
-		log.Fatal("drop index fail,", err)
+		log.Fatal("drop CourseInfo fail,", err)
 		return errmsg.ERROR
 	}
-	insertResult, err := indexCollection.InsertMany(context.TODO(), courseInfos)
+	insertResult, err := homepageCollection.InsertMany(context.TODO(), courseInfos)
 	if err != nil {
-		fmt.Println("insert a index fail")
-		log.Fatal("insert a index fail,", err)
+		fmt.Println("insert a CourseInfo fail")
+		log.Fatal("insert a CourseInfo fail,", err)
 		return errmsg.ERROR
 	}
 	fmt.Println("create a single document: ", insertResult.InsertedIDs)
@@ -70,11 +72,11 @@ func Timing() int {
 
 func Retrieve() ([]CourseInfo, int) {
 	var courseInfos []CourseInfo = make([]CourseInfo, 0)
-	cursor, err := indexCollection.Find(context.TODO(), bson.M{})
+	cursor, err := homepageCollection.Find(context.TODO(), bson.M{})
 	defer cursor.Close(context.TODO())
 	if err != nil {
-		fmt.Println("create a course fail")
-		log.Fatal("create a course fail,", err)
+		fmt.Println("get a CourseInfo fail")
+		log.Fatal("get a CourseInfo fail,", err)
 		return nil, errmsg.ERROR
 	}
 	if err := cursor.Err(); err != nil {
@@ -92,16 +94,16 @@ func Retrieve() ([]CourseInfo, int) {
 	return courseInfos, errmsg.SUCCESS
 }
 
-func IndexInit() {
+func HomepageInit() {
 	if db != nil {
-		if indexCollection == nil {
-			indexCollection = db.Collection("index")
+		if homepageCollection == nil {
+			homepageCollection = db.Collection("homepage")
 		} else {
-			fmt.Println("course collection has inited")
-			log.Fatal("course collection has inited")
+			fmt.Println("homepage collection has inited")
+			log.Fatal("homepage collection has inited")
 		}
 	} else {
-		fmt.Println("mongodb course collection init error, db has not inited")
-		log.Fatal("mongodb course collection init error, db has not inited")
+		fmt.Println("mongodb homepage collection init error, db has not inited")
+		log.Fatal("mongodb homepage collection init error, db has not inited")
 	}
 }

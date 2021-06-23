@@ -23,8 +23,8 @@ func testInsertCourse() {
 }
 
 func testUpdateCourse() {
-	id := "60cffca2b1f7f220d4fe0cf6"
-	model.UpdateCourse(id, "golang", "golang入门")
+	//id := "60cffca2b1f7f220d4fe0cf6"
+	//model.UpdateCourse(id, "golang", "golang入门")
 }
 
 func testDeleteCourse() {
