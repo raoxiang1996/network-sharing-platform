@@ -44,8 +44,8 @@ func GetCourse(CourseId string) (Courses, int) {
 	return course, errmsg.SUCCESS
 }
 
-// 按照规则查找课程
-func GetAllCourse(limit int, sortOption ...interface{}) ([]Courses, int) {
+// 按照规则查找课程 五个参数，index，返回的数量，是否排序，顺序还是逆序，排序的字段
+func GetAllCourse(index int, limit int, sortOption ...interface{}) ([]Courses, int) {
 	findoptions := options.Find()
 	if len(sortOption) == 3 {
 		isSort := sortOption[0].(bool)
@@ -69,6 +69,7 @@ func GetAllCourse(limit int, sortOption ...interface{}) ([]Courses, int) {
 
 	if limit > 0 {
 		findoptions.SetLimit(int64(limit))
+		findoptions.SetSkip(int64(limit) * int64(index))
 	} else if limit == 0 {
 		return nil, errmsg.SUCCESS
 	}

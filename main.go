@@ -98,7 +98,7 @@ func testTiming() {
 }
 
 func TestGetAllCourse() {
-	courses, _ := model.GetAllCourse(4, true, 1, "createtime")
+	courses, _ := model.GetAllCourse(0, 4, true, 1, "createtime")
 	for i := 0; i < len(courses); i++ {
 		fmt.Println(courses[i].ID + "  " + courses[i].CourseName + "  " + courses[i].Introduction + "  " + courses[i].Createtime + "  " + courses[i].UserId)
 	}
