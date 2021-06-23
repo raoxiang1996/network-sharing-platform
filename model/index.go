@@ -1,16 +1,15 @@
 package model
 
 import (
-	"University-Information-Website/utils/errmsg"
 	"context"
 	"fmt"
 	"log"
 
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
 	"gopkg.in/mgo.v2/bson"
 
-	"go.mongodb.org/mongo-driver/mongo"
+	"University-Information-Website/utils/errmsg"
 )
 
 var indexCollection *mongo.Collection = nil
@@ -44,7 +43,8 @@ func Timing() int {
 		var tmpCourse Courses
 		var tmpCourseInfos CourseInfo
 		if err = cursor.Decode(&tmpCourse); err != nil {
-
+			log.Fatal("decode course fail,", err)
+			return errmsg.ERROR
 		}
 		tmpCourseInfos.ID = bson.NewObjectId().Hex()
 		tmpCourseInfos.CourseId = tmpCourse.ID

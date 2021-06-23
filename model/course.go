@@ -1,14 +1,15 @@
 package model
 
 import (
-	"University-Information-Website/utils/errmsg"
 	"context"
 	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
-
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
+
+	"University-Information-Website/utils/errmsg"
 )
 
 type Lesson struct {
@@ -29,6 +30,72 @@ type Courses struct {
 }
 
 var coursesCollection *mongo.Collection = nil
+
+// 搜索一门课程
+func GetCourse(CourseId string) (Courses, int) {
+	filter := bson.M{"_id": CourseId}
+	var course Courses
+	err := coursesCollection.FindOne(context.TODO(), filter).Decode(&course)
+	if err != nil {
+		fmt.Println("get a course fail")
+		log.Fatal("get a course fail,", err)
+		return Courses{}, errmsg.ERROR
+	}
+	return course, errmsg.SUCCESS
+}
+
+// 按照规则查找课程
+func GetAllCourse(limit int, sortOption ...interface{}) ([]Courses, int) {
+	findoptions := options.Find()
+	if len(sortOption) == 3 {
+		isSort := sortOption[0].(bool)
+		if isSort == true {
+			option := sortOption[2].(string)
+			if sortOption[1].(int) == -1 {
+				findoptions.SetSort(bson.M{option: -1})
+			} else if sortOption[1].(int) == 1 {
+				findoptions.SetSort(bson.M{option: 1})
+			} else {
+				fmt.Println("parameter error：second option should be 1 or -1")
+				log.Fatal("parameter error：second option should be 1 or -1")
+				return nil, errmsg.ERROR
+			}
+		}
+	} else if len(sortOption) > 0 && len(sortOption) != 3 {
+		fmt.Println("parameter error：number of option should be 3")
+		log.Fatal("parameter error：number of option should be 3")
+		return nil, errmsg.ERROR
+	}
+
+	if limit > 0 {
+		findoptions.SetLimit(int64(limit))
+	} else if limit == 0 {
+		return nil, errmsg.SUCCESS
+	}
+
+	cursor, err := coursesCollection.Find(context.TODO(), bson.M{}, findoptions)
+	if err != nil {
+		fmt.Println("get courses fail")
+		log.Fatal("get courses fail,", err)
+		return nil, errmsg.ERROR
+	}
+
+	if err := cursor.Err(); err != nil {
+		log.Fatal("cursor is error", err)
+		return nil, errmsg.ERROR
+	}
+	defer cursor.Close(context.Background())
+	var courses []Courses = make([]Courses, 0)
+	for cursor.Next(context.Background()) {
+		var tmpCourse Courses
+		if err = cursor.Decode(&tmpCourse); err != nil {
+			log.Fatal("decode course fail,", err)
+			return nil, errmsg.ERROR
+		}
+		courses = append(courses, tmpCourse)
+	}
+	return courses, errmsg.SUCCESS
+}
 
 // 添加课程
 func CreateCourse(data *Courses, userId string) int {

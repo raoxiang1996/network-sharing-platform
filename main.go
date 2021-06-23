@@ -97,6 +97,13 @@ func testTiming() {
 	}
 }
 
+func TestGetAllCourse() {
+	courses, _ := model.GetAllCourse(4, true, 1, "createtime")
+	for i := 0; i < len(courses); i++ {
+		fmt.Println(courses[i].ID + "  " + courses[i].CourseName + "  " + courses[i].Introduction + "  " + courses[i].Createtime + "  " + courses[i].UserId)
+	}
+}
+
 func main() {
 
 	//testCreateComments()
@@ -105,7 +112,8 @@ func main() {
 	//testDeleteLesson()
 	model.InitDb()
 	model.InitModel()
-	testTiming()
+	//testTiming()
+	//TestGetAllCourse()
 	//now, _ := common.GetNowTime()
 	//fmt.Println(now)
 	//testInsertUser()

@@ -1,12 +1,12 @@
 package v1
 
 import (
-	"University-Information-Website/middleware"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 
+	"University-Information-Website/middleware"
 	"University-Information-Website/model"
 	"University-Information-Website/utils/errmsg"
 )

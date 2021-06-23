@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"log"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/scrypt"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 
 	"University-Information-Website/utils/errmsg"
 )

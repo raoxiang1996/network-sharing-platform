@@ -1,14 +1,14 @@
 package model
 
 import (
-	"University-Information-Website/utils/errmsg"
 	"context"
 	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
-
 	"gopkg.in/mgo.v2/bson"
+
+	"University-Information-Website/utils/errmsg"
 )
 
 type SingleComment struct {

@@ -1,11 +1,13 @@
 package v1
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	upload "University-Information-Website/Upload"
 	"University-Information-Website/utils/errmsg"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func UploadImg(c *gin.Context) {

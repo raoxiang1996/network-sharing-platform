@@ -1,7 +1,6 @@
 package model
 
 import (
-	"University-Information-Website/utils"
 	"context"
 	"fmt"
 	"log"
@@ -9,6 +8,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"University-Information-Website/utils"
 )
 
 var client *mongo.Client = nil
