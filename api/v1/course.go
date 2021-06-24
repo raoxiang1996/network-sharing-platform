@@ -20,8 +20,8 @@ func AddCourse(c *gin.Context) {
 
 	code := model.CreateCourse(&data, data.ID)
 	if code != errmsg.SUCCESS {
-		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, http.StatusBadRequest,
-			errmsg.GetErrMsg(errmsg.PARSEBODYFAIL))
+		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
+			errmsg.GetErrMsg(code))
 		c.JSON(http.StatusBadRequest, error)
 		return
 	}
@@ -39,7 +39,17 @@ func DeleteCourse(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, error)
 		return
 	}
-
+	code := model.DeleteCourses(data.ID)
+	if code != errmsg.SUCCESS {
+		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
+			errmsg.GetErrMsg(code))
+		c.JSON(http.StatusBadRequest, error)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": errmsg.GetErrMsg(code),
+	})
 }
 
 func AddLesson(c *gin.Context) {
@@ -53,8 +63,8 @@ func AddLesson(c *gin.Context) {
 
 	code := model.InsertLesson(&data, data.CoursesId)
 	if code != errmsg.SUCCESS {
-		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, http.StatusBadRequest,
-			errmsg.GetErrMsg(errmsg.PARSEBODYFAIL))
+		error := errmsg.SetErrorResponse(c.Request.Method, c.Request.URL.Path, code,
+			errmsg.GetErrMsg(code))
 		c.JSON(http.StatusBadRequest, error)
 		return
 	}

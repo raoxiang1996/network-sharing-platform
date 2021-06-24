@@ -1,6 +1,6 @@
 package v1
 
 //
-func GetIndex() {
+func GetHomepage() {
 
 }
