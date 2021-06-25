@@ -148,12 +148,34 @@ func UpdateCourse(data *Courses, coursesId string) int {
 	return errmsg.SUCCESS
 }
 
+//更新小节信息
+func UpdateLesson(data *Lesson, lessonId string) int {
+	filter := bson.M{"_id": data.CoursesId}
+	upDateData := bson.M{
+		"subject.$[elem].path": data.Path}
+	update := bson.M{"$set": upDateData}
+	opaf := []interface{}{bson.M{"elem._id": lessonId}}
+	af := options.FindOneAndUpdateOptions{ArrayFilters: &options.ArrayFilters{nil, opaf}}
+	updateResult := coursesCollection.FindOneAndUpdate(context.TODO(), filter, update, &af)
+	if updateResult.Err() != nil {
+		log.Println("Find error: ", updateResult.Err())
+	}
+	return errmsg.SUCCESS
+}
+
 //删除一节课程
 func DeleteLesson(coursesId string, lessonId string) int {
+	//删除这节的所有评论
+	code := DeleteLessonAllComment(coursesId, lessonId)
+	if code != errmsg.SUCCESS {
+		fmt.Println("delete a course fail")
+		log.Fatal("delete a course fail,", errmsg.GetErrMsg(code))
+		return errmsg.ERROR
+	}
+
 	filter := bson.M{"_id": coursesId}
 	update := bson.M{"$pull": bson.M{"subject": bson.M{"_id": lessonId, "courses_id": coursesId}}}
 	updateResult, err := coursesCollection.UpdateOne(context.TODO(), filter, update)
-	//删除这节的所有评论
 
 	if err != nil {
 		fmt.Println("delete a course fail")
@@ -166,9 +188,14 @@ func DeleteLesson(coursesId string, lessonId string) int {
 
 //删除课程
 func DeleteCourses(coursesId string) int {
-	deleteResult, err := coursesCollection.DeleteOne(context.TODO(), bson.M{"_id": coursesId})
 	//删除课程下所有评论
+	code := DeleteCourseAllComment(coursesId)
+	if code != errmsg.SUCCESS {
+		log.Fatal("delete courses fail", errmsg.GetErrMsg(code))
+		return errmsg.ERROR
+	}
 
+	deleteResult, err := coursesCollection.DeleteOne(context.TODO(), bson.M{"_id": coursesId})
 	if err != nil {
 		log.Fatal("delete courses fail", err)
 		return errmsg.ERROR

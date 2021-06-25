@@ -33,14 +33,25 @@ func testDeleteCourse() {
 }
 
 func testInsertLesson() {
-	id := "60d03c21b1f7f20d38ed3a16"
+	id := "60d1e8642eb5a44d8cd87efa"
 	lesson := model.Lesson{
 		bson.NewObjectId().Hex(),
 		id,
-		"root/lesson",
+		"root/lesson2",
 		"2006-01-02 15:04:05",
 	}
 	model.InsertLesson(&lesson, id)
+}
+
+func testEditLesson() {
+	id := "60d1e8642eb5a44d8cd87efa"
+	lesson := model.Lesson{
+		"60d4366e2eb5a40a78f0771e",
+		id,
+		"root/lesson2/edit",
+		"",
+	}
+	model.UpdateLesson(&lesson, lesson.ID)
 }
 
 func testDeleteLesson() {
@@ -119,6 +130,7 @@ func main() {
 	//testInsertUser()
 	//testDeleteLesson()
 	//testInsertLesson()
+	testEditLesson()
 	//testUpdateCourse()
 	//testInsertCourse()
 	//testDeleteCourse()

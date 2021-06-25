@@ -72,7 +72,7 @@ func GetUsers(pageSize int, pageNum int) ([]User, int) {
 
 // 删除用户
 func DeleteUser(id string) int {
-	deleteResult, err := userCollection.DeleteOne(context.TODO(), bson.M{"_id": bson.ObjectIdHex(id)})
+	deleteResult, err := userCollection.DeleteOne(context.TODO(), bson.M{"_id": id})
 	if err != nil {
 		log.Fatal("delete a user fail", err)
 		return errmsg.ERROR

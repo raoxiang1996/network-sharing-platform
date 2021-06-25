@@ -61,7 +61,7 @@ func InsertComment(data *SingleComment, coursesId string, lessonId string) int {
 	return errmsg.SUCCESS
 }
 
-//删除评论
+//删除一条评论
 func DeleteComment(coursesId string, lessonId string, commentId string) int {
 	filter := bson.M{"courses_id": coursesId, "lesson_id": lessonId}
 	update := bson.M{"$pull": bson.M{"all_comments": bson.M{"_id": commentId}}}
@@ -72,6 +72,31 @@ func DeleteComment(coursesId string, lessonId string, commentId string) int {
 		return errmsg.ERROR
 	}
 	fmt.Printf("Matched %v documents and insert %v documents.\n", insertResult.MatchedCount, insertResult.ModifiedCount)
+	return errmsg.SUCCESS
+}
+
+//删除某节课的所有评论
+func DeleteLessonAllComment(coursesId string, lessonId string) int {
+	filter := bson.M{"courses_id": coursesId, "lesson_id": lessonId}
+	deleteResult, err := commentCollection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("delete lesson comments fail")
+		log.Fatal("delete lesson comments fail,", err)
+		return errmsg.ERROR
+	}
+	fmt.Printf("Matched and delete %v documents.\n", deleteResult.DeletedCount)
+	return errmsg.SUCCESS
+}
+
+func DeleteCourseAllComment(coursesId string) int {
+	filter := bson.M{"courses_id": coursesId}
+	deleteResult, err := commentCollection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("delete courses comments fail")
+		log.Fatal("delete courses comments fail,", err)
+		return errmsg.ERROR
+	}
+	fmt.Printf("Matched and delete %v documents.\n", deleteResult.DeletedCount)
 	return errmsg.SUCCESS
 }
 
