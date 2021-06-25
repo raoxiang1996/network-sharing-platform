@@ -148,6 +148,21 @@ func UpdateCourse(data *Courses, coursesId string) int {
 	return errmsg.SUCCESS
 }
 
+//更新小节信息
+func UpdateLesson(data *Lesson, lessonId string) int {
+	filter := bson.M{"_id": data.CoursesId}
+	upDateData := bson.M{
+		"subject.$[elem].path": data.Path}
+	update := bson.M{"$set": upDateData}
+	opaf := []interface{}{bson.M{"elem._id": lessonId}}
+	af := options.FindOneAndUpdateOptions{ArrayFilters: &options.ArrayFilters{nil, opaf}}
+	updateResult := coursesCollection.FindOneAndUpdate(context.TODO(), filter, update, &af)
+	if updateResult.Err() != nil {
+		log.Println("Find error: ", updateResult.Err())
+	}
+	return errmsg.SUCCESS
+}
+
 //删除一节课程
 func DeleteLesson(coursesId string, lessonId string) int {
 	//删除这节的所有评论

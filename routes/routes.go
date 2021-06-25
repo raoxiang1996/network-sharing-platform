@@ -17,27 +17,34 @@ func InitRouter() {
 		// User模块的路由接口
 		auth.PUT("user/:id", v1.UpdateUser)
 		auth.DELETE("user/:id", v1.DeleteUser)
-
 		auth.GET("users", v1.GetUsers)
+
+		//Upload
 		auth.POST("upload", v1.Upload)
+
+		//Course
+		auth.POST("course", v1.AddCourse)
+		auth.DELETE("course/:id", v1.DeleteCourse)
+		auth.PUT("course/:id", v1.EditCourse)
+
+		//Lesson
+		auth.POST("lesson", v1.AddLesson)
+		auth.DELETE("lesson", v1.DeleteLesson)
+		auth.PUT("lesson/:id", v1.EditLesson)
 	}
 
 	router := r.Group("api/v1")
 	{
 		//User
-		router.POST("user/add", v1.AddUser)
+		router.POST("user", v1.AddUser)
 
 		//Login
 		router.POST("login/admin", v1.Login)
 		router.POST("login/front", v1.FrontLogin)
+
+		//course
+		router.GET("course/:id", v1.GetCourse)
+		router.GET("courses", v1.GetCourses)
 	}
-	//{
-	//	// User模块的路由接口
-	//	router.PUT("user/:id", v1.UpdateUser)
-	//	router.DELETE("user/:id", v1.DeleteUser)
-	//
-	//	router.POST("user/add", v1.AddUser)
-	//	router.GET("users", v1.GetUsers)
-	//}
 	r.Run(utils.HttpPort)
 }
