@@ -2,6 +2,7 @@ package main
 
 import (
 	"University-Information-Website/model"
+	"University-Information-Website/utils/errmsg"
 	"fmt"
 
 	"gopkg.in/mgo.v2/bson"
@@ -108,10 +109,20 @@ func testTiming() {
 	}
 }
 
-func TestGetAllCourse() {
+func testGetAllCourse() {
 	courses, _ := model.GetAllCourse(0, 4, true, 1, "createtime")
 	for i := 0; i < len(courses); i++ {
 		fmt.Println(courses[i].ID + "  " + courses[i].CourseName + "  " + courses[i].Introduction + "  " + courses[i].Createtime + "  " + courses[i].UserId)
+	}
+}
+
+func testSearchCourse() {
+	courses, err := model.SearchCourse(0, 30, "深入理解计算机系统")
+	if err != errmsg.SUCCESS {
+		fmt.Println("error")
+	}
+	for i := 0; i < len(courses); i++ {
+		fmt.Println(courses[i].CourseId + " " + courses[i].CourseName + " " + courses[i].CourseImage + " " + courses[i].CourseName)
 	}
 }
 
@@ -123,6 +134,7 @@ func main() {
 	//testDeleteLesson()
 	model.InitDb()
 	model.InitModel()
+	testSearchCourse()
 	//testTiming()
 	//TestGetAllCourse()
 	//now, _ := common.GetNowTime()
