@@ -31,9 +31,43 @@ type Courses struct {
 
 var coursesCollection *mongo.Collection = nil
 
-// 搜索一门课程
-func GetCourse(CourseId string) (Courses, int) {
-	filter := bson.M{"_id": CourseId}
+// 搜索课程
+func SearchCourse(index int, limit int, searchContent string) ([]CourseInfo, int) {
+	findoptions := options.Find()
+	findoptions.SetLimit(int64(limit))
+	findoptions.SetSkip(int64(limit) * int64(index))
+	//findoptions.SetSort(bson.M{"createtime": -1})
+	cursor, err := coursesCollection.Find(context.TODO(), bson.M{"$text": bson.M{"$search": searchContent}, "score": bson.M{"$meta": "textScore"}}, findoptions)
+	if err != nil {
+		log.Fatal("search course：find is error", err)
+		return nil, errmsg.ERROR
+	}
+	if err := cursor.Err(); err != nil {
+		log.Fatal("search course：cursor is error", err)
+		return nil, errmsg.ERROR
+	}
+	defer cursor.Close(context.Background())
+	var courseInfos []CourseInfo = make([]CourseInfo, 0)
+	for cursor.Next(context.Background()) {
+		var tmpCourse Courses
+		var tmpCourseInfos CourseInfo
+		if err = cursor.Decode(&tmpCourse); err != nil {
+			log.Fatal("search course：decode course fail,", err)
+			return nil, errmsg.ERROR
+		}
+		tmpCourseInfos.ID = bson.NewObjectId().Hex()
+		tmpCourseInfos.CourseId = tmpCourse.ID
+		tmpCourseInfos.CourseName = tmpCourse.CourseName
+		tmpCourseInfos.CourseImage = tmpCourse.Images
+		tmpCourseInfos.Createtime = tmpCourse.Createtime
+		courseInfos = append(courseInfos, tmpCourseInfos)
+	}
+	return courseInfos, errmsg.SUCCESS
+}
+
+// 查找一门课程
+func GetCourse(courseId string) (Courses, int) {
+	filter := bson.M{"_id": courseId}
 	var course Courses
 	err := coursesCollection.FindOne(context.TODO(), filter).Decode(&course)
 	if err != nil {
@@ -82,7 +116,7 @@ func GetAllCourse(index int, limit int, sortOption ...interface{}) ([]Courses, i
 	}
 
 	if err := cursor.Err(); err != nil {
-		log.Fatal("cursor is error", err)
+		log.Fatal("get all courses：cursor is error", err)
 		return nil, errmsg.ERROR
 	}
 	defer cursor.Close(context.Background())
@@ -209,6 +243,13 @@ func courseInit() {
 	if db != nil {
 		if coursesCollection == nil {
 			coursesCollection = db.Collection("course")
+			coursesCollection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+				Keys: bson.M{
+					"course_name":  "text",
+					"introduction": "text",
+				},
+				//Options: options.Index().SetUnique(true),
+			})
 		} else {
 			fmt.Println("course collection has inited")
 			log.Fatal("course collection has inited")
